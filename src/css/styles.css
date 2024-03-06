@@ -1,0 +1,50 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.floating-section {
+    position: fixed;
+    top: 50%;
+    left: 10px;
+    /* Adjust as needed */
+    transform: translateY(-50%);
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+.shape-option {
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.display-section {
+    margin-left: 150px;
+    /* Adjust as needed */
+    padding: 20px;
+    border: 1px solid #ccc;
+    margin-top: 50px;
+}
+
+/* Shapes styling (for demonstration purposes) */
+#circle {
+    width: 100px;
+    height: 100px;
+    background-color: #f00;
+    border-radius: 50%;
+}
+
+#square {
+    width: 100px;
+    height: 100px;
+    background-color: #0f0;
+}
+
+#triangle {
+    width: 0;
+    height: 0;
+    border-left: 50px solid transparent;
+    border-right: 50px solid transparent;
+    border-bottom: 100px solid #00f;
+}

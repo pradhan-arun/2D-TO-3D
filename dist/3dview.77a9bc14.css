@@ -1,0 +1,49 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.floating-section {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  position: fixed;
+  top: 50%;
+  left: 10px;
+  transform: translateY(-50%);
+}
+
+.shape-option {
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.display-section {
+  border: 1px solid #ccc;
+  margin-top: 50px;
+  margin-left: 150px;
+  padding: 20px;
+}
+
+#circle {
+  background-color: red;
+  border-radius: 50%;
+  width: 100px;
+  height: 100px;
+}
+
+#square {
+  background-color: #0f0;
+  width: 100px;
+  height: 100px;
+}
+
+#triangle {
+  border-bottom: 100px solid #00f;
+  border-left: 50px solid #0000;
+  border-right: 50px solid #0000;
+  width: 0;
+  height: 0;
+}
+
+/*# sourceMappingURL=3dview.77a9bc14.css.map */

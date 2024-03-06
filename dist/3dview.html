@@ -1,11 +1,125 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head><script src="/3dview.97327220.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Shape Selector</title>
+    <link rel="stylesheet" href="/3dview.77a9bc14.css">
 </head>
+
 <body>
-    <script src="/3dview.5eaf6f9a.js" defer=""></script>
+
+    <!-- <div class="floating-section">
+        <div class="shape-option" id="circle">Circle</div>
+        <div class="shape-option" id="square">Square</div>
+        <div class="shape-option" id="triangle">Triangle</div>
+    </div>
+
+    <div class="display-section" id="shape-display">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="modify-section" id="modify-section">
+        <h2>Modify Selected Shape</h2>
+        <div class="key" id="right-arrow">➡</div>
+        <div class="key" id="left-arrow">⬅</div>
+        <div class="key" id="up-arrow">⬆</div>
+        <div class="key" id="down-arrow">⬇</div>
+    </div> -->
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> -->
+    <script src="/3dview.177dfa8f.js" defer=""></script>
 </body>
+
 </html>
+
+<!-- <!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shape Selector</title>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+
+<body>
+
+    <div class="floating-section">
+        <div class="shape-option" id="circle">Circle</div>
+        <div class="shape-option" id="square">Square</div>
+        <div class="shape-option" id="triangle">Triangle</div>
+    </div>
+
+    <div class="display-section" id="shape-display">
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Initialize Three.js
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("canvas") });
+        renderer.setSize(window.innerWidth - 200, window.innerHeight - 200); // Adjust canvas size
+
+        camera.position.z = 5;
+
+        // Render loop
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Shape selection handling
+        document.querySelectorAll('.shape-option').forEach(option => {
+            option.addEventListener('click', function () {
+                const shape = this.id;
+                if (shape === 'circle') {
+                    // Call function to add circle to Three.js scene
+                    addCircle();
+                } else if (shape === 'square') {
+                    // Call function to add square to Three.js scene
+                    addSquare();
+                } else if (shape === 'triangle') {
+                    // Call function to add triangle to Three.js scene
+                    addTriangle();
+                }
+            });
+        });
+
+        // Function to add a circle to Three.js scene
+        function addCircle() {
+            const circleGeometry = new THREE.CircleGeometry(1, 32);
+            const circleMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const circleMesh = new THREE.Mesh(circleGeometry, circleMaterial);
+            scene.add(circleMesh);
+        }
+
+        // Function to add a square to Three.js scene
+        function addSquare() {
+            const squareGeometry = new THREE.BoxGeometry(1, 1, 1);
+            const squareMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const squareMesh = new THREE.Mesh(squareGeometry, squareMaterial);
+            scene.add(squareMesh);
+        }
+
+        // Function to add a triangle to Three.js scene
+        function addTriangle() {
+            const triangleGeometry = new THREE.Geometry();
+            triangleGeometry.vertices.push(new THREE.Vector3(0, 1, 0));
+            triangleGeometry.vertices.push(new THREE.Vector3(-1, -1, 0));
+            triangleGeometry.vertices.push(new THREE.Vector3(1, -1, 0));
+            triangleGeometry.faces.push(new THREE.Face3(0, 1, 2));
+            triangleGeometry.faces.push(new THREE.Face3(2, 1, 0));
+            const triangleMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+            const triangleMesh = new THREE.Mesh(triangleGeometry, triangleMaterial);
+            scene.add(triangleMesh);
+        }
+
+    </script>
+</body>
+
+</html> -->
