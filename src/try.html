@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Wall Drawing</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            /* Prevent scroll bars */
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas2D" width="700" height="600"></canvas>
+    <button id="saveButton"> Save</button>
+    <a href="index.html">back</a>
+    <script>
+        const canvas2D = document.getElementById('canvas2D');
+        const ctx2D = canvas2D.getContext('2d');
+        let lines = []; // Array to store lines
+        let currentLine = []; // Array to store current line's points
+        const lineWidth = 5; // Set the line width
+
+        function onMouseDown(event) {
+            const startX = event.offsetX;
+            const startY = event.offsetY;
+            console.log("start x = ", startX);
+            console.log("start y = ", startY);
+            currentLine = [{ x: startX, y: startY }]; // Store the start point of the line
+            canvas2D.addEventListener('mousemove', onMouseMove);
+            canvas2D.addEventListener('mouseup', onMouseUp);
+        }
+
+        function onMouseMove(event) {
+            const currentX = event.offsetX;
+            const currentY = event.offsetY;
+            redrawCanvas();
+            ctx2D.beginPath();
+            ctx2D.moveTo(currentLine[0].x, currentLine[0].y);
+            ctx2D.lineTo(currentX, currentY);
+            ctx2D.lineWidth = lineWidth; // Set the line width
+            ctx2D.stroke();
+        }
+
+        function onMouseUp(event) {
+            const currentX = event.offsetX;
+            const currentY = event.offsetY;
+            currentLine.push({ x: currentX, y: currentY }); // Store the end point of the line
+            lines.push(currentLine); // Push the current line to the array of lines
+            currentLine = []; // Reset the current line
+            console.log("current ===> ", lines);
+            canvas2D.removeEventListener('mousemove', onMouseMove);
+            canvas2D.removeEventListener('mouseup', onMouseUp);
+        }
+
+        function redrawCanvas() {
+            ctx2D.clearRect(0, 0, canvas2D.width, canvas2D.height);
+            lines.forEach(line => {
+                ctx2D.beginPath();
+                ctx2D.moveTo(line[0].x, line[0].y);
+                ctx2D.lineTo(line[1].x, line[1].y);
+                ctx2D.lineWidth = lineWidth; // Set the line width
+                ctx2D.stroke();
+            });
+        }
+        function categorizePointsByFloor(points) {
+            // Sort points based on y-coordinate
+            points.sort((a, b) => a.y - b.y);
+            
+            let pointsByFloor = {};
+            
+            // Iterate through sorted points and categorize them by floor
+            for (let point of points) {
+                if (!(point.y in pointsByFloor)) {
+                    pointsByFloor[point.y] = [];
+                }
+                pointsByFloor[point.y].push(point);
+            }
+            
+            return pointsByFloor;
+        }
+        function saveLines() {
+            localStorage.setItem('lines', JSON.stringify(lines)); // Save the lines array in localStorage
+            console.log("count floors = ", categorizePointsByFloor(lines));
+        }
+        document.getElementById("saveButton").addEventListener('click', saveLines)
+
+        // Event listener for drawing
+        canvas2D.addEventListener('mousedown', onMouseDown);
+    </script>
+</body>
+
+</html>
