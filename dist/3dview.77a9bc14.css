@@ -20,8 +20,6 @@ body {
 
 .display-section {
   border: 1px solid #ccc;
-  margin-top: 50px;
-  margin-left: 150px;
   padding: 20px;
 }
 
@@ -44,6 +42,29 @@ body {
   border-right: 50px solid #0000;
   width: 0;
   height: 0;
+}
+
+#modification-container {
+  display: flex;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+#modification-container > div {
+  margin-right: 10px;
+}
+
+#position-section, #rotation-section, #size-section, #scale-section {
+  background-color: #fffc;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+#position-section button, #rotation-section button, #size-section button, #scale-section button {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  display: block;
 }
 
 /*# sourceMappingURL=3dview.77a9bc14.css.map */
