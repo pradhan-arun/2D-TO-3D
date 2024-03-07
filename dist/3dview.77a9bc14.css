@@ -6,10 +6,12 @@ body {
 .floating-section {
   background-color: #fff;
   border: 1px solid #ccc;
+  border-radius: 10px;
   padding: 10px;
+  display: none;
   position: fixed;
-  top: 50%;
-  left: 10px;
+  top: 20%;
+  left: 5px;
   transform: translateY(-50%);
 }
 
@@ -45,7 +47,7 @@ body {
 }
 
 #modification-container {
-  display: flex;
+  display: none;
   position: absolute;
   bottom: 10px;
   right: 10px;

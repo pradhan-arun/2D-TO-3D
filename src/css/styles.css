@@ -5,13 +5,15 @@ body {
 
 .floating-section {
     position: fixed;
-    top: 50%;
-    left: 10px;
+    top: 20%;
+    left: 5px;
     /* Adjust as needed */
     transform: translateY(-50%);
     background-color: #fff;
     padding: 10px;
     border: 1px solid #ccc;
+    border-radius: 10px;
+    display: none;
 }
 
 .shape-option {
@@ -52,7 +54,7 @@ body {
     position: absolute;
     bottom: 10px;
     right: 10px;
-    display: flex;
+    display: none;
 }
 
 #modification-container > div {
