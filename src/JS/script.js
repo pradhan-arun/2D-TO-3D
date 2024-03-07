@@ -70,11 +70,9 @@
 
 
 
-
-
-
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import {image1,image2,image3,image4,image5,image6,image7,image8} from '../assets/AllImage'
 
 // Create a scene
 const scene = new THREE.Scene();
@@ -88,19 +86,20 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// Load GLB model
-const loader = new GLTFLoader();
-loader.load('../brabus_g900_rocket_edition.glb', function () {
-    console.log("++++++++++++++++++");
-    // scene.add(gltf.scene);
-});
-
+const orbit = new OrbitControls(camera, renderer.domElement);
 // Add lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-directionalLight.position.set(0, 1, 0);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+directionalLight.position.set(1, 0, 5);
 scene.add(directionalLight);
+
+// console.log("image texture = ", imageTexture);
+const cubeGeometry = new THREE.BoxGeometry(0.6, 0.6, 0.6);
+const cube = new THREE.Mesh(cubeGeometry,  new THREE.MeshBasicMaterial({ map:new THREE.TextureLoader().load(image5)}));
+
+scene.add(cube);
+
 
 // Render loop
 function animate() {
@@ -108,3 +107,17 @@ function animate() {
     renderer.render(scene, camera);
 }
 animate();
+
+const images = document.querySelectorAll('.sidebar img');
+images.forEach(image => {
+    image.addEventListener('click', function() {
+        var imagePath = this.getAttribute('id');
+        console.log("image path is called", imagePath);
+        console.log("image path is called", cube);
+        imagePath = imagePath == 'image1' ?image1: imagePath == 'image2' ?image2:imagePath == 'image3' ?image3:image4;
+        cube.material = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(imagePath) });
+        // scene.add(cube)
+        cube.material.needsUpdate = true;
+    });
+});
+

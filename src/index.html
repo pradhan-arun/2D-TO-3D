@@ -1,13 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Extruded Mesh Example</title>
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        a:hover {
+            background-color: brown;
+        }
+
+        .sidebar {
+            position: absolute;
+            top: 10;
+            left: 10;
+            width: 150px;
+            background-color: #f0f0f0;
+            padding: 10px;
+            display:none;
+        }
+
+        .sidebar img {
+            width: 100%;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+    </style>
 </head>
+
 <body>
-    <a href="try.html">Next</a>
-    <a href="3dview.html">3d</a>
+    <div style="position: absolute; top: 2%; right: 0%;">
+        <a href="try.html"
+            style="margin: 2px; padding: 15px; border-radius: 5px; background-color: blueviolet; color: azure;">Next</a>
+        <a href="3dview.html"
+            style="margin: 2px; padding: 15px;border-radius: 5px; background-color: blueviolet; color: azure;">3d</a>
+    </div>
+    <div class="sidebar">
+        <img src="./assets/image1.jpeg" alt="Image 1" id="image1">
+        <img src="./assets/image2.jpeg" alt="Image 2" id="image2">
+        <img src="./assets/image3.jpeg" alt="Image 3" id="image3">
+        <img src="./assets/image4.jpeg" alt="Image 4" id="image4">
+        <img src="./assets/image5.jpeg" alt="Image 5" id="image5">
+    </div>
+    <!-- <script src="./JS/hooks.js" type="module"></script> -->
     <script src="./JS/script.js" type="module"></script>
+
 </body>
+
 </html>
