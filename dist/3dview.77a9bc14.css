@@ -69,4 +69,20 @@ body {
   display: block;
 }
 
+.sidebar {
+  background-color: #f0f0f0;
+  width: 150px;
+  padding: 10px;
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.sidebar img {
+  cursor: pointer;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
 /*# sourceMappingURL=3dview.77a9bc14.css.map */

@@ -57,7 +57,7 @@ body {
     display: none;
 }
 
-#modification-container > div {
+#modification-container>div {
     margin-right: 10px;
 }
 
@@ -69,6 +69,7 @@ body {
     padding: 10px;
     border-radius: 5px;
 }
+
 #position-section button,
 #rotation-section button,
 #size-section button,
@@ -76,4 +77,20 @@ body {
     display: block;
     margin-top: 5px;
     margin-bottom: 5px;
+}
+
+.sidebar {
+    position: absolute;
+    top: 10;
+    right: 10;
+    width: 150px;
+    background-color: #f0f0f0;
+    padding: 10px;
+    display: none;
+}
+
+.sidebar img {
+    width: 100%;
+    margin-bottom: 10px;
+    cursor: pointer;
 }

@@ -1,29 +1,33 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { image1, image2, image3, image4, image5, image6, image7, image8 } from '../assets/AllImage'
 // Initialize Three.js
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(120, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("canvas") });
 renderer.setSize(window.innerWidth, window.innerHeight); // Adjust canvas size
+camera.updateProjectionMatrix();
 
-camera.position.z = 5;
+camera.position.z = 5
 
 const orbit = new OrbitControls(camera, renderer.domElement);
+orbit.enableRotate = true; // Allow rotation
+orbit.enableZoom = true; // Allow zooming
+orbit.enablePan = false; // Disable panning
 
 var floatingValue = document.getElementsByClassName('floating-section')[0];
+var sidebarValue = document.getElementsByClassName('sidebar')[0];
 var modificationValue = document.getElementById("modification-container");
 
 // Retrieve lines from local storage
 const lines = JSON.parse(window.localStorage.getItem('lines'));
 console.log("lines = ", lines);
 const wallMeshes = lines.map((linePoints, index) => {
-    // if (index === 2) {
     const mesh = createWallMesh(linePoints);
     mesh.rotation.x = -Math.PI / 2;
-    mesh.name = index;
+    mesh.name = "wall";
     return mesh;
-    // }
 });
 wallMeshes.forEach(mesh => scene.add(mesh));
 
@@ -31,14 +35,15 @@ wallMeshes.forEach(mesh => scene.add(mesh));
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector3();
 
+let selectedMesh = null; // Initialize selectedMesh variable
 var objectValue = null;
 // Event listener for mouse click
 window.addEventListener('dblclick', onMouseClick, false);
-let selectedMesh = null; // Initialize selectedMesh variable
 
 // Render loop
 function animate() {
     requestAnimationFrame(animate);
+    orbit.update();
     renderer.render(scene, camera);
 }
 animate();
@@ -178,26 +183,13 @@ function createWallMesh(linePoints, addSpecial = false) {
     const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     const material = new THREE.MeshBasicMaterial({ color: getRandomColor() }); // Assign random color to the wall
     const wallMesh = new THREE.Mesh(geometry, material);
-
-    if (addSpecial) {
-        // Add something special to the wall
-        const specialGeometry = new THREE.BoxGeometry(2, 2, 0.5); // Example: Adding a small box
-        const specialMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-        const specialMesh = new THREE.Mesh(specialGeometry, specialMaterial);
-
-        // Position the special addition on the wall's surface
-        const wallBoundingBox = new THREE.Box3().setFromObject(wallMesh);
-        const wallHeight = wallBoundingBox.max.y - wallBoundingBox.min.y;
-        const specialPosition = new THREE.Vector3(0, wallHeight / 2, 2); // Adjust position relative to the wall
-        specialMesh.position.copy(specialPosition);
-        wallMesh.add(specialMesh); // Add the special object as a child of the wall
-    }
+    wallMesh.name = "wall";
 
     // Create a group to hold both wall and square meshes
     const wallGroup = new THREE.Group();
     wallGroup.add(wallMesh); // Add square mesh to the group
 
-    return wallGroup;
+    return wallMesh;
 }
 
 // Function to generate random color
@@ -226,40 +218,59 @@ function onMouseClick(event) {
     if (intersects.length > 0) {
         // If the ray intersects with any object
         const clickedObject = intersects[0].object;
-
+        console.log("clicked object == ", clickedObject);
         // Check if the clicked object is already selected
         if (clickedObject === selectedMesh) {
             // If already selected, deselect it and reset its properties
-            selectedMesh.material.color.setHex(originalColor); // Revert to original color
+
+            if (selectedMesh.material.map === null) selectedMesh.material.color.setHex(originalColor);
+            else selectedMesh.material.color.setHex(0xffffff);
+            // Revert to original color
             selectedMesh = null; // Reset selectedMesh
-            originalColor = null; // Reset originalColor
+            originalColor = null;
+            objectValue = null; // Reset originalColor
             floatingValue.style.display = "none";
             modificationValue.style.display = "none";
+            sidebarValue.style.display = 'none';
         } else {
             // If not selected, select it and change its properties
             if (selectedMesh) {
                 // If there is a previously selected mesh, reset its properties
-                selectedMesh.material.color.setHex(originalColor); // Revert previous selected mesh to original color
+                if (selectedMesh.material.map === null) selectedMesh.material.color.setHex(originalColor);
+                else selectedMesh.material.color.setHex(0xffffff);// Revert previous selected mesh to original color
+
+                if (selectedMesh.name === 'window') {
+                    selectedMesh.material.color.setHex(originalColor)
+                }
             }
             // Update the selected mesh and its properties
             selectedMesh = clickedObject;
             objectValue = clickedObject;
             originalColor = selectedMesh.material.color.getHex();
             selectedMesh.material.color.setHex(0xff0000); // Change color to indicate selection
-
+            updateValue = false;
             console.log("clicked-------", clickedObject);
             console.log("floating value = ", modificationValue);
-            floatingValue.style.display = "block";
+            if (clickedObject.name == 'wall') {
+                floatingValue.style.display = "block";
+                sidebarValue.style.display = 'block';
+            } else {
+                sidebarValue.style.display = 'none';
+                floatingValue.style.display = "block";
+            }
             modificationValue.style.display = "flex";
-            
         }
     } else {
         // If no object is clicked, deselect any previously selected mesh
         if (selectedMesh) {
-            selectedMesh.material.color.setHex(originalColor);// Revert to original color
+            if (selectedMesh.material.map === null) selectedMesh.material.color.setHex(originalColor);
+            else selectedMesh.material.color.setHex(0xffffff);// Revert to original color
+
             floatingValue.style.display = "none";
+            sidebarValue.style.display = 'none';
             selectedMesh = null; // Reset selectedMesh
-            originalColor = null; // Reset originalColor
+            originalColor = null;
+            objectValue = null; // Reset originalColor
         }
     }
 }
@@ -279,7 +290,9 @@ function addSquare() {
     const squareMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     const squareMesh = new THREE.Mesh(squareGeometry, squareMaterial);
     console.log("add square is caled", checkIntersection());
+    // squareMesh.opacity= 0;
     squareMesh.position.copy(calculateCenterPosition());
+    squareMesh.name = "window"
     // objectValue.add(squareMesh);
 
     console.log("calcultate center = ", calculateCenterPosition());
@@ -346,75 +359,38 @@ function showModifySection(selectedObject) {
     });
 }
 
+//image add section
+const images = document.querySelectorAll('.sidebar img');
+images.forEach(image => {
+    image.addEventListener('click', function () {
+        var imagePath = this.getAttribute('id');
+        console.log("image path is called", imagePath);
+        console.log("image path is called", selectedMesh);
+        imagePath = imagePath == 'image1' ? image1
+            : imagePath == 'image2' ? image2
+                : imagePath == 'image3' ? image3
+                    : imagePath == 'image4' ? image4
+                        : imagePath == 'image5' ? image5 : image6;
+        if (selectedMesh) {
+            console.log("selected mesh === ", selectedMesh);
 
 
+            // Ensure the geometry's UVs are set
+            selectedMesh.uvsNeedUpdate = true;
 
-// Create wall meshes and add them to the scene
+            const newMaterial = new THREE.MeshBasicMaterial({
+                map: new THREE.TextureLoader().load(imagePath),
+                roughness: 0.75, // Adjust roughness (0 to 1)
+                metalness: 0.25,
+                bumpScale: 0.009,
+            });
 
-
-
-// // Function to create wall mesh
-// function createWallMesh(linePoints) {
-//     const shape = new THREE.Shape(linePoints.map(point => new THREE.Vector3(
-//         (point.x / 200) * 2 - 1,
-//         -(point.y / 250) * 2 + 1,
-//     )));
-
-//     const extrudeSettings = {
-//         depth: 2, // Adjusted wall thickness to include extra width
-//         bevelEnabled: false
-//     };
-
-//     const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-//     const material = new THREE.MeshBasicMaterial({ color: getRandomColor() }); // Assign random color to the wall
-//     return new THREE.Mesh(geometry, material);
-// }
-
-// function createWallMesh(linePoints) {
-//     const shape = new THREE.Shape(linePoints.map(point => new THREE.Vector3(
-//         (point.x / 200) * 2 - 1,
-//         -(point.y / 250) * 2 + 1,
-//     )));
-
-//     // Create a rectangle shape for the square
-//     const squareShape = new THREE.Shape();
-//     squareShape.moveTo(-0.5, -0.5); // Define square vertices
-//     squareShape.lineTo(0.5, -0.5);
-//     squareShape.lineTo(0.5, 0.5);
-//     squareShape.lineTo(-0.5, 0.5);
-//     squareShape.lineTo(-0.5, -0.5);
-
-//     // Create extrude settings for the square
-//     const extrudeSettingsSquare = {
-//         depth: 0.2, // Adjust square thickness
-//         bevelEnabled: false
-//     };
-
-//     // Create geometry and mesh for the square
-//     const geometrySquare = new THREE.ExtrudeGeometry(squareShape, extrudeSettingsSquare);
-//     const materialSquare = new THREE.MeshBasicMaterial({ color: getRandomColor() }); // Assign random color to the square
-//     const squareMesh = new THREE.Mesh(geometrySquare, materialSquare);
-
-//     // Set position and rotation of the square relative to the wall
-//     squareMesh.position.set(0, 0, 1); // Adjust z position to place the square in front of the wall
-//     squareMesh.rotation.x = -Math.PI / 2; // Rotate square to align with the wall
-
-//     // Create extrude settings for the wall
-//     const extrudeSettings = {
-//         depth: 2, // Adjusted wall thickness to include extra width
-//         bevelEnabled: false
-//     };
-
-//     // Create geometry and mesh for the wall
-//     const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-//     const material = new THREE.MeshBasicMaterial({ color: getRandomColor() }); // Assign random color to the wall
-//     const wallMesh = new THREE.Mesh(geometry, material);
-
-//     // Create a group to hold both wall and square meshes
-//     const wallGroup = new THREE.Group();
-//     wallGroup.add(squareMesh); // Add square mesh to the group
-//     wallGroup.add(wallMesh);
-
-//     return wallGroup;
-// }
+            // Set the material color to be fully transparent
+            // newMaterial.transparent = true;
+            // newMaterial.opacity = 0;
+            selectedMesh.material = newMaterial;
+            selectedMesh.material.needsUpdate = true;
+        }
+    });
+});
 
