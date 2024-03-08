@@ -189,7 +189,7 @@ function createWallMesh(linePoints, addSpecial = false) {
     const wallGroup = new THREE.Group();
     wallGroup.add(wallMesh); // Add square mesh to the group
 
-    return wallMesh;
+    return wallGroup;
 }
 
 // Function to generate random color

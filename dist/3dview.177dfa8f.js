@@ -712,7 +712,7 @@ function createWallMesh(linePoints, addSpecial = false) {
     // Create a group to hold both wall and square meshes
     const wallGroup = new _three.Group();
     wallGroup.add(wallMesh); // Add square mesh to the group
-    return wallMesh;
+    return wallGroup;
 }
 // Function to generate random color
 function getRandomColor() {

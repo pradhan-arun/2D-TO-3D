@@ -11,6 +11,69 @@
             padding: 0;
             overflow: hidden;
             /* Prevent scroll bars */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #canvas2D {
+            border: 1px solid #ccc;
+            /* Add a border */
+            border-radius: 10px;
+            /* Add border radius */
+            box-shadow: 0 4px 8px rgba(96, 210, 238, 0.705);
+            /* Add shadow */
+            margin-bottom: 20px;
+            /* Add space between canvas and button */
+        }
+
+        #saveButton {
+            padding: 10px 20px;
+            /* Add padding */
+            background-color: #007bff;
+            /* Button background color */
+            color: white;
+            /* Button text color */
+            border: none;
+            /* Remove button border */
+            border-radius: 5px;
+            /* Add button border radius */
+            cursor: pointer;
+            /* Add pointer cursor on hover */
+            transition: background-color 0.3s;
+            margin-left: 2px;
+            /* Add transition effect */
+        }
+
+        #saveButton:hover {
+            background-color: #0056b3;
+            /* Change background color on hover */
+        }
+
+        a {
+            padding: 10px 20px;
+            text-decoration: none;
+            /* Add padding */
+            background-color: #007bff;
+            /* Button background color */
+            color: white;
+            /* Button text color */
+            border: none;
+            /* Remove button border */
+            border-radius: 5px;
+            /* Add button border radius */
+            cursor: pointer;
+            /* Add pointer cursor on hover */
+            transition: background-color 0.3s;
+            /* Add transition effect */
+            margin-left: 2px;
+        }
+
+        a:hover {
+            background-color: #0056b3;
+            /* Change background color on hover */
         }
     </style>
 </head>
@@ -71,9 +134,9 @@
         function categorizePointsByFloor(points) {
             // Sort points based on y-coordinate
             points.sort((a, b) => a.y - b.y);
-            
+
             let pointsByFloor = {};
-            
+
             // Iterate through sorted points and categorize them by floor
             for (let point of points) {
                 if (!(point.y in pointsByFloor)) {
@@ -81,7 +144,7 @@
                 }
                 pointsByFloor[point.y].push(point);
             }
-            
+
             return pointsByFloor;
         }
         function saveLines() {

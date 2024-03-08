@@ -72,10 +72,14 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+// import model from '../model/Tree1.glb';
 import {image1,image2,image3,image4,image5,image6,image7,image8} from '../assets/AllImage'
 
 // Create a scene
 const scene = new THREE.Scene();
+
+const model = '../model/Tree1.glb';
 
 // Create a camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -99,6 +103,17 @@ const cubeGeometry = new THREE.BoxGeometry(0.6, 0.6, 0.6);
 const cube = new THREE.Mesh(cubeGeometry,  new THREE.MeshBasicMaterial({ map:new THREE.TextureLoader().load(image5)}));
 
 scene.add(cube);
+
+var loader = new GLTFLoader();
+loader.load(model, function(gltf) {
+    console.log("loaded - ", gltf);
+	// Add the model to the scene
+	// scene.add(gltf.scene);
+  
+	// Render the scene
+	// renderer.render(scene, camera);
+  
+  });
 
 
 // Render loop
