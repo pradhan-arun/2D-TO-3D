@@ -687,7 +687,7 @@ images.forEach((image)=>{
     });
 });
 
-},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls":"7mqRv","../assets/AllImage":"h1oCP","three/examples/jsm/loaders/GLTFLoader":"dVRsF"}],"dVRsF":[function(require,module,exports) {
+},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls":"7mqRv","three/examples/jsm/loaders/GLTFLoader":"dVRsF","../assets/AllImage":"h1oCP"}],"dVRsF":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "GLTFLoader", ()=>GLTFLoader);

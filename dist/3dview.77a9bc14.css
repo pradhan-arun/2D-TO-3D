@@ -1,5 +1,6 @@
 body {
   margin: 0;
+  padding: 0;
   font-family: Arial, sans-serif;
 }
 
@@ -83,6 +84,12 @@ body {
   cursor: pointer;
   width: 100%;
   margin-bottom: 10px;
+}
+
+#add-floor {
+  position: absolute;
+  top: 20%;
+  left: 10%;
 }
 
 /*# sourceMappingURL=3dview.77a9bc14.css.map */

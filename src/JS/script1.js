@@ -1,6 +1,7 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { gsap } from 'gsap';
 import { image1, image2, image3, image4, image5, image6, image7, image8 } from '../assets/AllImage'
 // Initialize Three.js
 const scene = new THREE.Scene();
@@ -12,9 +13,10 @@ camera.updateProjectionMatrix();
 camera.position.z = 5
 
 const orbit = new OrbitControls(camera, renderer.domElement);
-orbit.enableRotate = true; // Allow rotation
-orbit.enableZoom = true; // Allow zooming
-orbit.enablePan = false; // Disable panning
+orbit.enableDamping = true;
+// orbit.enableRotate = true; // Allow rotation
+// orbit.enableZoom = true; // Allow zooming
+// orbit.enablePan = false; // Disable panning
 
 var floatingValue = document.getElementsByClassName('floating-section')[0];
 var sidebarValue = document.getElementsByClassName('sidebar')[0];
@@ -23,13 +25,13 @@ var modificationValue = document.getElementById("modification-container");
 // Retrieve lines from local storage
 const lines = JSON.parse(window.localStorage.getItem('lines'));
 console.log("lines = ", lines);
-const wallMeshes = lines.map((linePoints, index) => {
-    const mesh = createWallMesh(linePoints);
-    mesh.rotation.x = -Math.PI / 2;
-    mesh.name = "wall";
-    return mesh;
-});
-wallMeshes.forEach(mesh => scene.add(mesh));
+// const wallMeshes = lines.map((linePoints, index) => {
+//     const mesh = createWallMesh(linePoints);
+//     mesh.rotation.x = -Math.PI / 2;
+//     mesh.name = "wall";
+//     return mesh;
+// });
+// wallMeshes.forEach(mesh => scene.add(mesh));
 
 // Raycaster for click detection
 const raycaster = new THREE.Raycaster();
@@ -63,6 +65,11 @@ document.querySelectorAll('.shape-option').forEach(option => {
             addTriangle();
         }
     });
+});
+document.getElementById('add-floor').addEventListener('click', function () {
+    console.log("add floor is called");
+    createFloor(lines);
+
 });
 
 // Event listeners for position modification
@@ -167,29 +174,40 @@ document.getElementById('scale-down').addEventListener('click', function () {
 
 
 // ALL FUNCTIONS
+var wallHeightAbove = 3; // Adjust the height above each wall for the new wall
 
-function createWallMesh(linePoints, addSpecial = false) {
+const wallMeshes = lines.map((linePoints, index) => {
+    const mesh = createWallMesh(linePoints);
+    mesh.rotation.x = -Math.PI / 2;
+    mesh.name = "wall";
+    scene.add(mesh);
+    // scene.add(newWallMesh);
+
+    return [mesh]; // Return both the original and new wall meshes
+}).flat(); // Flatten the array of meshes
+
+function createWallMesh(linePoints, heightAbove = 0, depth = 3, color = getRandomColor()) {
     console.log("line page == ", linePoints);
-    const shape = new THREE.Shape(linePoints.map(point => new THREE.Vector2(
-        (point.x / 200) * 2 - 1,
-        -(point.y / 250) * 2 + 1,
+    const shape = new THREE.Shape(linePoints.map(point => new THREE.Vector3(
+        point.x,
+        point.y,
+        point.z
     )));
 
     const extrudeSettings = {
-        depth: 2, // Adjusted wall thickness to include extra width
+        depth: depth, // Adjusted wall thickness to include extra width
         bevelEnabled: false
     };
 
     const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-    const material = new THREE.MeshBasicMaterial({ color: getRandomColor() }); // Assign random color to the wall
+    const material = new THREE.MeshBasicMaterial({ color: color }); // Assign random color to the wall
     const wallMesh = new THREE.Mesh(geometry, material);
     wallMesh.name = "wall";
 
-    // Create a group to hold both wall and square meshes
-    const wallGroup = new THREE.Group();
-    wallGroup.add(wallMesh); // Add square mesh to the group
+    // Offset the position of the wall if heightAbove is specified
+    wallMesh.position.y += heightAbove;
 
-    return wallGroup;
+    return wallMesh;
 }
 
 // Function to generate random color
@@ -247,7 +265,11 @@ function onMouseClick(event) {
             selectedMesh = clickedObject;
             objectValue = clickedObject;
             originalColor = selectedMesh.material.color.getHex();
-            selectedMesh.material.color.setHex(0xff0000); // Change color to indicate selection
+            selectedMesh.material.color.setHex(0xff0000);
+            // Calculate a new position for the camera relative to the clicked object
+
+
+
             updateValue = false;
             console.log("clicked-------", clickedObject);
             console.log("floating value = ", modificationValue);
@@ -268,9 +290,9 @@ function onMouseClick(event) {
 
             floatingValue.style.display = "none";
             sidebarValue.style.display = 'none';
-            selectedMesh = null; // Reset selectedMesh
+            selectedMesh = null;
             originalColor = null;
-            objectValue = null; // Reset originalColor
+            objectValue = null;
         }
     }
 }
@@ -378,8 +400,11 @@ images.forEach(image => {
             // Ensure the geometry's UVs are set
             selectedMesh.uvsNeedUpdate = true;
 
+            const img = new THREE.TextureLoader().load(imagePath);
+            img.wrapS = THREE.MirroredRepeatWrapping;
+            img.wrapT = THREE.MirroredRepeatWrapping;
             const newMaterial = new THREE.MeshBasicMaterial({
-                map: new THREE.TextureLoader().load(imagePath),
+                map: img,
                 roughness: 0.75, // Adjust roughness (0 to 1)
                 metalness: 0.25,
                 bumpScale: 0.009,
@@ -394,3 +419,17 @@ images.forEach(image => {
     });
 });
 
+const floorGroup = new THREE.Group();
+
+scene.add(floorGroup);
+function createFloor(linePoints) {
+    linePoints.map((line) => {
+        console.log("'wall meshes = ", wallMeshes);
+        const newWallMesh = createWallMesh(line, wallHeightAbove, 2);
+        newWallMesh.rotation.x = -Math.PI / 2;
+        newWallMesh.position.y += 0.01; // Offset the new wall's position above the current one
+        newWallMesh.name = "wall";
+        scene.add(newWallMesh);
+    })
+    wallHeightAbove += 2
+}
