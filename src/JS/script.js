@@ -45,10 +45,10 @@
 
 // 	// Add the model to the scene
 // 	scene.add(gltf.scene);
-  
+
 // 	// Render the scene
 // 	renderer.render(scene, camera);
-  
+
 //   });
 
 // // createExtrudedMesh();
@@ -72,14 +72,12 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-// import model from '../model/Tree1.glb';
-import {image1,image2,image3,image4,image5,image6,image7,image8} from '../assets/AllImage'
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
+import Stats from 'three/examples/jsm/libs/stats.module'
+import { image1, image2, image3, image4, image5, image6, image7, image8 } from '../assets/AllImage'
 
 // Create a scene
 const scene = new THREE.Scene();
-
-const model = '../model/Tree1.glb';
 
 // Create a camera
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -91,6 +89,10 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const orbit = new OrbitControls(camera, renderer.domElement);
+orbit.enableDamping = true;
+orbit.enabled = false;
+const stats = new Stats();
+
 // Add lighting
 const ambientLight = new THREE.AmbientLight(0xffffff, 1);
 scene.add(ambientLight);
@@ -100,39 +102,150 @@ scene.add(directionalLight);
 
 // console.log("image texture = ", imageTexture);
 const cubeGeometry = new THREE.BoxGeometry(0.6, 0.6, 0.6);
-const cube = new THREE.Mesh(cubeGeometry,  new THREE.MeshBasicMaterial({ map:new THREE.TextureLoader().load(image5)}));
+const cube = new THREE.Mesh(cubeGeometry, new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(image5) }));
+const controls = new TransformControls(camera, renderer.domElement);
+scene.add(cube)
+controls.attach(cube)
+scene.add(controls);
+// setTimeout(() => {
+//     console.log("called");
+//     removeTransformControls()
+// }, 3000);
 
-scene.add(cube);
+// setTimeout(() => {
+//     console.log("called");
+//     scene.add(cube)
+// controls.attach(cube)
+// scene.add(controls);
+// }, 7000);
 
-var loader = new GLTFLoader();
-loader.load(model, function(gltf) {
-    console.log("loaded - ", gltf);
-	// Add the model to the scene
-	// scene.add(gltf.scene);
-  
-	// Render the scene
-	// renderer.render(scene, camera);
-  
-  });
+// scene.add(cube);
+window.addEventListener('keydown', function (event) {
+    console.log("event code = ", event.code);
+    switch (event.code) {
+        case 'KeyG':
+            controls.setMode('translate')
+            break
+        case 'KeyR':
+            controls.setMode('rotate')
+            break
+        case 'KeyS':
+            controls.setMode('scale')
+            break
+    }
+})
+
+document.body.appendChild(stats.dom)
 
 
 // Render loop
 function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
+    stats.update();
+    // orbit.update();
 }
 animate();
 
 const images = document.querySelectorAll('.sidebar img');
 images.forEach(image => {
-    image.addEventListener('click', function() {
+    image.addEventListener('click', function () {
         var imagePath = this.getAttribute('id');
         console.log("image path is called", imagePath);
         console.log("image path is called", cube);
-        imagePath = imagePath == 'image1' ?image1: imagePath == 'image2' ?image2:imagePath == 'image3' ?image3:image4;
+        imagePath = imagePath == 'image1' ? image1 : imagePath == 'image2' ? image2 : imagePath == 'image3' ? image3 : image4;
         cube.material = new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load(imagePath) });
         // scene.add(cube)
         cube.material.needsUpdate = true;
     });
 });
 
+function removeTransformControls() {
+    if (controls) {
+        // Detach the controls from any attached object
+        controls.detach();
+
+        // Remove the controls from the scene
+        scene.remove(controls);
+
+        // Dispose of the controls to release resources
+        controls.dispose();
+
+        // Set controls to null to indicate it's no longer in use
+        // controls = null;
+    }
+}
+
+
+// import * as THREE from 'three';
+// import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+// import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
+// import Stats from 'three/examples/jsm/libs/stats.module'
+
+// const scene = new THREE.Scene()
+// // scene.add(new THREE.AxesHelper(5))
+
+// const camera = new THREE.PerspectiveCamera(
+//     75,
+//     window.innerWidth / window.innerHeight,
+//     0.1,
+//     1000
+// )
+// camera.position.z = 2
+
+// const renderer = new THREE.WebGLRenderer()
+// renderer.setSize(window.innerWidth, window.innerHeight)
+// document.body.appendChild(renderer.domElement);
+// const orbit = new OrbitControls(camera, renderer.domElement);
+
+// const geometry = new THREE.BoxGeometry()
+// const material = new THREE.MeshNormalMaterial()
+
+// const cube = new THREE.Mesh(geometry, material)
+// scene.add(cube)
+
+// const controls = new TransformControls(camera, renderer.domElement)
+// controls.attach(cube)
+// scene.add(controls)
+
+// window.addEventListener('keydown', function (event) {
+//     console.log("event code = ", event.code);
+//     switch (event.code) {
+//         case 'KeyG':
+//             controls.setMode('translate')
+//             break
+//         case 'KeyR':
+//             controls.setMode('rotate')
+//             break
+//         case 'KeyS':
+//             controls.setMode('scale')
+//             break
+//     }
+// })
+
+// window.addEventListener('resize', onWindowResize, false)
+// function onWindowResize() {
+//     camera.aspect = window.innerWidth / window.innerHeight
+//     camera.updateProjectionMatrix()
+//     renderer.setSize(window.innerWidth, window.innerHeight)
+//     render()
+// }
+
+// const stats = new Stats()
+// document.body.appendChild(stats.dom)
+
+// function animate() {
+//     requestAnimationFrame(animate)
+
+//     // controls.update()
+
+//     render()
+
+//     stats.update()
+// }
+
+// function render() {
+//     renderer.render(scene, camera)
+// }
+
+// animate()

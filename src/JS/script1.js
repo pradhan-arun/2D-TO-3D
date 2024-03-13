@@ -2,13 +2,17 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { gsap } from 'gsap';
-import { image1, image2, image3, image4, image5, image6, image7, image8 } from '../assets/AllImage'
+import { image1, image2, image3, image4, image5, image6, image7, image8 } from '../assets/AllImage';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
+import Stats from 'three/examples/jsm/libs/stats.module'
 // Initialize Three.js
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(120, window.innerWidth / window.innerHeight, 0.1, 1000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById("canvas") });
 renderer.setSize(window.innerWidth, window.innerHeight); // Adjust canvas size
 camera.updateProjectionMatrix();
+var controls = new TransformControls(camera, renderer.domElement);
+const stats = new Stats();
 
 camera.position.z = 5
 
@@ -25,13 +29,6 @@ var modificationValue = document.getElementById("modification-container");
 // Retrieve lines from local storage
 const lines = JSON.parse(window.localStorage.getItem('lines'));
 console.log("lines = ", lines);
-// const wallMeshes = lines.map((linePoints, index) => {
-//     const mesh = createWallMesh(linePoints);
-//     mesh.rotation.x = -Math.PI / 2;
-//     mesh.name = "wall";
-//     return mesh;
-// });
-// wallMeshes.forEach(mesh => scene.add(mesh));
 
 // Raycaster for click detection
 const raycaster = new THREE.Raycaster();
@@ -45,11 +42,26 @@ window.addEventListener('dblclick', onMouseClick, false);
 // Render loop
 function animate() {
     requestAnimationFrame(animate);
-    orbit.update();
+    // orbit.update();
     renderer.render(scene, camera);
 }
 animate();
 
+window.addEventListener('keydown', function (event) {
+    console.log("event code = ", event.code);
+    switch (event.code) {
+        case 'KeyG':
+            controls.setMode('translate')
+            break
+        case 'KeyR':
+            controls.setMode('rotate')
+            break
+        case 'KeyS':
+            controls.setMode('scale')
+            break
+    }
+})
+document.body.appendChild(stats.dom);
 // Shape selection handling
 document.querySelectorAll('.shape-option').forEach(option => {
     option.addEventListener('click', function () {
@@ -236,7 +248,7 @@ function onMouseClick(event) {
     if (intersects.length > 0) {
         // If the ray intersects with any object
         const clickedObject = intersects[0].object;
-        console.log("clicked object == ", clickedObject);
+        console.log("Detect the object   == ", clickedObject);
         // Check if the clicked object is already selected
         if (clickedObject === selectedMesh) {
             // If already selected, deselect it and reset its properties
@@ -273,14 +285,15 @@ function onMouseClick(event) {
             updateValue = false;
             console.log("clicked-------", clickedObject);
             console.log("floating value = ", modificationValue);
-            if (clickedObject.name == 'wall') {
-                floatingValue.style.display = "block";
+            // if (clickedObject.name == 'wall') {
+                // floatingValue.style.display = "block";
                 sidebarValue.style.display = 'block';
-            } else {
-                sidebarValue.style.display = 'none';
-                floatingValue.style.display = "block";
-            }
-            modificationValue.style.display = "flex";
+            // } else {
+            //     sidebarValue.style.display = 'none';
+            // }
+            floatingValue.style.display = "block";
+            // modificationValue.style.display = "flex";
+
         }
     } else {
         // If no object is clicked, deselect any previously selected mesh
@@ -293,6 +306,25 @@ function onMouseClick(event) {
             selectedMesh = null;
             originalColor = null;
             objectValue = null;
+        }
+    }
+
+    console.log("Selected mesh = ", selectedMesh)
+    if(selectedMesh){
+        controls.attach(selectedMesh);
+        scene.add(controls);
+        orbit.enabled = false;
+    }else{
+        if(controls){
+        controls.detach();
+
+        // Remove the controls from the scene
+        scene.remove(controls);
+
+        // Dispose of the controls to release resources
+        // controls.dispose();
+        // controls = null;
+        orbit.enabled=true;
         }
     }
 }
@@ -308,14 +340,13 @@ function addCircle() {
 
 // Function to add a square to Three.js scene
 function addSquare() {
-    const squareGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
+    const squareGeometry = new THREE.BoxGeometry(0.5, 0.5,0);
     const squareMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     const squareMesh = new THREE.Mesh(squareGeometry, squareMaterial);
     console.log("add square is caled", checkIntersection());
     // squareMesh.opacity= 0;
     squareMesh.position.copy(calculateCenterPosition());
-    squareMesh.name = "window"
-    // objectValue.add(squareMesh);
+    squareMesh.name = "window";
 
     console.log("calcultate center = ", calculateCenterPosition());
     // checkIntersection();
@@ -432,4 +463,26 @@ function createFloor(linePoints) {
         scene.add(newWallMesh);
     })
     wallHeightAbove += 2
+}
+
+document.addEventListener('mousemove',ObjectMove);
+
+function ObjectMove(event){
+    let data = getMousePosition(event);
+    // if(selectedMesh && selectedMesh.name === 'window'){
+    //     selectedMesh.position.set(data.x, data.y, data.z)
+    // }
+}
+
+function getMousePosition(event) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width * 2 - 1;
+    const y = -(event.clientY - rect.top) / rect.height * 2 + 1;
+    const mouse3D = new THREE.Vector3(x, y, 0); // Z = 0 to draw lines on the ground plane
+    mouse3D.unproject(camera);
+    const dir = mouse3D.sub(camera.position).normalize();
+    const distance = -camera.position.z / dir.z;
+    const pos = camera.position.clone().add(dir.multiplyScalar(distance));
+    // console.log("posss ====  ", pos);
+    return pos;
 }

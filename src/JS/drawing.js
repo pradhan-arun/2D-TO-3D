@@ -32,13 +32,11 @@ function onMouseDown(event) {
     startPoint = getMousePosition(event);
     currentWall = createWall(startPoint.clone(), startPoint.clone());
     scene.add(currentWall);
-    // updateWall(currentWall, startPoint.clone(),startPoint.clone())''
 }
 
 function onMouseMove(event) {
     let data = getMousePosition(event);
     mesh.position.set(data.x, data.y, data.z);
-    // console.log("data == ", data);
     if (startPoint !== null) {
         const endPoint = getMousePosition(event);
         endPoints = endPoint;

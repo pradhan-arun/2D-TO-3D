@@ -579,10 +579,14 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 }
 
 },{}],"6V1YQ":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 var _three = require("three");
 var _orbitControls = require("three/examples/jsm/controls/OrbitControls");
 var _gsap = require("gsap");
 var _allImage = require("../assets/AllImage");
+var _transformControls = require("three/examples/jsm/controls/TransformControls");
+var _statsModule = require("three/examples/jsm/libs/stats.module");
+var _statsModuleDefault = parcelHelpers.interopDefault(_statsModule);
 // Initialize Three.js
 const scene = new _three.Scene();
 const camera = new _three.PerspectiveCamera(120, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -591,6 +595,8 @@ const renderer = new _three.WebGLRenderer({
 });
 renderer.setSize(window.innerWidth, window.innerHeight); // Adjust canvas size
 camera.updateProjectionMatrix();
+var controls = new (0, _transformControls.TransformControls)(camera, renderer.domElement);
+const stats = new (0, _statsModuleDefault.default)();
 camera.position.z = 5;
 const orbit = new (0, _orbitControls.OrbitControls)(camera, renderer.domElement);
 orbit.enableDamping = true;
@@ -603,13 +609,6 @@ var modificationValue = document.getElementById("modification-container");
 // Retrieve lines from local storage
 const lines = JSON.parse(window.localStorage.getItem("lines"));
 console.log("lines = ", lines);
-// const wallMeshes = lines.map((linePoints, index) => {
-//     const mesh = createWallMesh(linePoints);
-//     mesh.rotation.x = -Math.PI / 2;
-//     mesh.name = "wall";
-//     return mesh;
-// });
-// wallMeshes.forEach(mesh => scene.add(mesh));
 // Raycaster for click detection
 const raycaster = new _three.Raycaster();
 const mouse = new _three.Vector3();
@@ -620,10 +619,25 @@ window.addEventListener("dblclick", onMouseClick, false);
 // Render loop
 function animate() {
     requestAnimationFrame(animate);
-    orbit.update();
+    // orbit.update();
     renderer.render(scene, camera);
 }
 animate();
+window.addEventListener("keydown", function(event) {
+    console.log("event code = ", event.code);
+    switch(event.code){
+        case "KeyG":
+            controls.setMode("translate");
+            break;
+        case "KeyR":
+            controls.setMode("rotate");
+            break;
+        case "KeyS":
+            controls.setMode("scale");
+            break;
+    }
+});
+document.body.appendChild(stats.dom);
 // Shape selection handling
 document.querySelectorAll(".shape-option").forEach((option)=>{
     option.addEventListener("click", function() {
@@ -750,7 +764,7 @@ function onMouseClick(event) {
     if (intersects.length > 0) {
         // If the ray intersects with any object
         const clickedObject = intersects[0].object;
-        console.log("clicked object == ", clickedObject);
+        console.log("Detect the object   == ", clickedObject);
         // Check if the clicked object is already selected
         if (clickedObject === selectedMesh) {
             // If already selected, deselect it and reset its properties
@@ -780,14 +794,14 @@ function onMouseClick(event) {
             updateValue = false;
             console.log("clicked-------", clickedObject);
             console.log("floating value = ", modificationValue);
-            if (clickedObject.name == "wall") {
-                floatingValue.style.display = "block";
-                sidebarValue.style.display = "block";
-            } else {
-                sidebarValue.style.display = "none";
-                floatingValue.style.display = "block";
-            }
-            modificationValue.style.display = "flex";
+            // if (clickedObject.name == 'wall') {
+            // floatingValue.style.display = "block";
+            sidebarValue.style.display = "block";
+            // } else {
+            //     sidebarValue.style.display = 'none';
+            // }
+            floatingValue.style.display = "block";
+        // modificationValue.style.display = "flex";
         }
     } else // If no object is clicked, deselect any previously selected mesh
     if (selectedMesh) {
@@ -798,6 +812,20 @@ function onMouseClick(event) {
         selectedMesh = null;
         originalColor = null;
         objectValue = null;
+    }
+    console.log("Selected mesh = ", selectedMesh);
+    if (selectedMesh) {
+        controls.attach(selectedMesh);
+        scene.add(controls);
+        orbit.enabled = false;
+    } else if (controls) {
+        controls.detach();
+        // Remove the controls from the scene
+        scene.remove(controls);
+        // Dispose of the controls to release resources
+        // controls.dispose();
+        // controls = null;
+        orbit.enabled = true;
     }
 }
 // Function to add a circle to Three.js scene
@@ -812,7 +840,7 @@ function addCircle() {
 }
 // Function to add a square to Three.js scene
 function addSquare() {
-    const squareGeometry = new _three.BoxGeometry(0.5, 0.5, 0.5);
+    const squareGeometry = new _three.BoxGeometry(0.5, 0.5, 0);
     const squareMaterial = new _three.MeshBasicMaterial({
         color: 0x00ff00
     });
@@ -821,7 +849,6 @@ function addSquare() {
     // squareMesh.opacity= 0;
     squareMesh.position.copy(calculateCenterPosition());
     squareMesh.name = "window";
-    // objectValue.add(squareMesh);
     console.log("calcultate center = ", calculateCenterPosition());
     // checkIntersection();
     scene.add(squareMesh);
@@ -923,8 +950,27 @@ function createFloor(linePoints) {
     });
     wallHeightAbove += 2;
 }
+document.addEventListener("mousemove", ObjectMove);
+function ObjectMove(event) {
+    let data = getMousePosition(event);
+// if(selectedMesh && selectedMesh.name === 'window'){
+//     selectedMesh.position.set(data.x, data.y, data.z)
+// }
+}
+function getMousePosition(event) {
+    const rect = renderer.domElement.getBoundingClientRect();
+    const x = (event.clientX - rect.left) / rect.width * 2 - 1;
+    const y = -(event.clientY - rect.top) / rect.height * 2 + 1;
+    const mouse3D = new _three.Vector3(x, y, 0); // Z = 0 to draw lines on the ground plane
+    mouse3D.unproject(camera);
+    const dir = mouse3D.sub(camera.position).normalize();
+    const distance = -camera.position.z / dir.z;
+    const pos = camera.position.clone().add(dir.multiplyScalar(distance));
+    // console.log("posss ====  ", pos);
+    return pos;
+}
 
-},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls":"7mqRv","../assets/AllImage":"h1oCP","gsap":"fPSuC"}],"fPSuC":[function(require,module,exports) {
+},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls":"7mqRv","../assets/AllImage":"h1oCP","gsap":"fPSuC","three/examples/jsm/controls/TransformControls":"7wM6b","three/examples/jsm/libs/stats.module":"6xUSB","@parcel/transformer-js/src/esmodule-helpers.js":"8ppW9"}],"fPSuC":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "gsap", ()=>gsapWithCSS);
