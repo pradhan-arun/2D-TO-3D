@@ -597,7 +597,7 @@ renderer.setSize(window.innerWidth, window.innerHeight); // Adjust canvas size
 camera.updateProjectionMatrix();
 var controls = new (0, _transformControls.TransformControls)(camera, renderer.domElement);
 const stats = new (0, _statsModuleDefault.default)();
-camera.position.z = 5;
+camera.position.set(10, 10, 0);
 const orbit = new (0, _orbitControls.OrbitControls)(camera, renderer.domElement);
 orbit.enableDamping = true;
 // orbit.enableRotate = true; // Allow rotation
@@ -606,6 +606,14 @@ orbit.enableDamping = true;
 var floatingValue = document.getElementsByClassName("floating-section")[0];
 var sidebarValue = document.getElementsByClassName("sidebar")[0];
 var modificationValue = document.getElementById("modification-container");
+const planeGeometry = new _three.PlaneGeometry(15, 15);
+const plane = new _three.Mesh(planeGeometry, new _three.MeshBasicMaterial({
+    map: new _three.TextureLoader().load((0, _allImage.floor1))
+}));
+plane.rotateX(-Math.PI / 2);
+// plane.position.y = -1.75
+// plane.receiveShadow = true
+scene.add(plane);
 // Retrieve lines from local storage
 const lines = JSON.parse(window.localStorage.getItem("lines"));
 console.log("lines = ", lines);
@@ -966,7 +974,6 @@ function getMousePosition(event) {
     const dir = mouse3D.sub(camera.position).normalize();
     const distance = -camera.position.z / dir.z;
     const pos = camera.position.clone().add(dir.multiplyScalar(distance));
-    // console.log("posss ====  ", pos);
     return pos;
 }
 

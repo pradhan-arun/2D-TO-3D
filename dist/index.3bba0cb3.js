@@ -782,6 +782,6 @@ function removeTransformControls() {
  // }
  // animate()
 
-},{"three":"ktPTu","three/examples/jsm/controls/TransformControls":"7wM6b","three/examples/jsm/libs/stats.module":"6xUSB","@parcel/transformer-js/src/esmodule-helpers.js":"8ppW9","three/examples/jsm/controls/OrbitControls":"7mqRv","../assets/AllImage":"h1oCP"}]},["c9WgK","9nOHn"], "9nOHn", "parcelRequire20bc")
+},{"three":"ktPTu","three/examples/jsm/controls/OrbitControls":"7mqRv","../assets/AllImage":"h1oCP","three/examples/jsm/controls/TransformControls":"7wM6b","three/examples/jsm/libs/stats.module":"6xUSB","@parcel/transformer-js/src/esmodule-helpers.js":"8ppW9"}]},["c9WgK","9nOHn"], "9nOHn", "parcelRequire20bc")
 
 //# sourceMappingURL=index.3bba0cb3.js.map

@@ -2,7 +2,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { gsap } from 'gsap';
-import { image1, image2, image3, image4, image5, image6, image7, image8 } from '../assets/AllImage';
+import { floor1, image1, image2, image3, image4, image5, image6, image7, image8 } from '../assets/AllImage';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 import Stats from 'three/examples/jsm/libs/stats.module'
 // Initialize Three.js
@@ -14,7 +14,7 @@ camera.updateProjectionMatrix();
 var controls = new TransformControls(camera, renderer.domElement);
 const stats = new Stats();
 
-camera.position.z = 5
+camera.position.set(10,10,0)
 
 const orbit = new OrbitControls(camera, renderer.domElement);
 orbit.enableDamping = true;
@@ -25,6 +25,13 @@ orbit.enableDamping = true;
 var floatingValue = document.getElementsByClassName('floating-section')[0];
 var sidebarValue = document.getElementsByClassName('sidebar')[0];
 var modificationValue = document.getElementById("modification-container");
+
+const planeGeometry = new THREE.PlaneGeometry(15, 15)
+const plane = new THREE.Mesh(planeGeometry, new THREE.MeshBasicMaterial({map:new THREE.TextureLoader().load(floor1)}))
+plane.rotateX(-Math.PI / 2)
+// plane.position.y = -1.75
+// plane.receiveShadow = true
+scene.add(plane)
 
 // Retrieve lines from local storage
 const lines = JSON.parse(window.localStorage.getItem('lines'));
@@ -483,6 +490,5 @@ function getMousePosition(event) {
     const dir = mouse3D.sub(camera.position).normalize();
     const distance = -camera.position.z / dir.z;
     const pos = camera.position.clone().add(dir.multiplyScalar(distance));
-    // console.log("posss ====  ", pos);
     return pos;
 }
