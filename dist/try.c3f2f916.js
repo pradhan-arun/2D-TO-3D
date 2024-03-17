@@ -142,15 +142,16 @@
       this[globalName] = mainExports;
     }
   }
-})({"dbx8l":[function(require,module,exports) {
+})({"8jXYs":[function(require,module,exports) {
 var global = arguments[3];
 var HMR_HOST = null;
 var HMR_PORT = null;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
+var HMR_USE_SSE = false;
 module.bundle.HMR_BUNDLE_ID = "950b1ac1c3f2f916";
 "use strict";
-/* global HMR_HOST, HMR_PORT, HMR_ENV_HASH, HMR_SECURE, chrome, browser, __parcel__import__, __parcel__importScripts__, ServiceWorkerGlobalScope */ /*::
+/* global HMR_HOST, HMR_PORT, HMR_ENV_HASH, HMR_SECURE, HMR_USE_SSE, chrome, browser, __parcel__import__, __parcel__importScripts__, ServiceWorkerGlobalScope */ /*::
 import type {
   HMRAsset,
   HMRMessage,
@@ -189,6 +190,7 @@ declare var HMR_HOST: string;
 declare var HMR_PORT: string;
 declare var HMR_ENV_HASH: string;
 declare var HMR_SECURE: boolean;
+declare var HMR_USE_SSE: boolean;
 declare var chrome: ExtensionContext;
 declare var browser: ExtensionContext;
 declare var __parcel__import__: (string) => Promise<void>;
@@ -232,7 +234,8 @@ if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== "undefined") {
         "0.0.0.0"
     ].includes(hostname) ? "wss" : "ws";
     var ws;
-    try {
+    if (HMR_USE_SSE) ws = new EventSource("/__parcel_hmr");
+    else try {
         ws = new WebSocket(protocol + "://" + hostname + (port ? ":" + port : "") + "/");
     } catch (err) {
         if (err.message) console.error(err.message);
@@ -302,12 +305,14 @@ if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== "undefined") {
             }
         }
     };
-    ws.onerror = function(e) {
-        if (e.message) console.error(e.message);
-    };
-    ws.onclose = function() {
-        console.warn("[parcel] \uD83D\uDEA8 Connection to the HMR server was lost");
-    };
+    if (ws instanceof WebSocket) {
+        ws.onerror = function(e) {
+            if (e.message) console.error(e.message);
+        };
+        ws.onclose = function() {
+            console.warn("[parcel] \uD83D\uDEA8 Connection to the HMR server was lost");
+        };
+    }
 }
 function removeErrorOverlay() {
     var overlay = document.getElementById(OVERLAY_ID);
@@ -591,7 +596,7 @@ document.body.appendChild(renderer.domElement);
 // Initialize arrays to store walls and floors
 const walls = [];
 let floor = null;
-let cube = new _three.BoxGeometry(0.2, 0.2, 0.2);
+let cube = new _three.BoxGeometry(0.1, 0.1, 0.1);
 let material = new _three.MeshBasicMaterial({
     color: "white"
 });
@@ -621,8 +626,18 @@ function onMouseMove(event) {
     }
 }
 function onMouseUp(event) {
-    console.log("start point == ", startPoint);
-    console.log("end point = ", endPoints);
+    console.log("start point == ", Math.ceil(startPoint.x), Math.ceil(startPoint.y));
+    console.log("end point = ", Math.ceil(endPoints.x), Math.ceil(endPoints.y));
+    startPoint.x = Math.ceil(startPoint.x);
+    startPoint.y = Math.ceil(startPoint.y);
+    endPoints.x = Math.ceil(endPoints.x);
+    endPoints.y = Math.ceil(endPoints.y);
+    // Check if the start and end points are close enough to close the line
+    if (startPoint && endPoints && startPoint.distanceTo(endPoints) < 0.1) {
+        console.log("Line is closed");
+        // Close the line by connecting the last point to the start point
+        updateWall(currentWall, startPoint, startPoint);
+    }
     allLines.push([
         startPoint,
         endPoints
@@ -631,9 +646,6 @@ function onMouseUp(event) {
     console.log("all lines = ", allLines);
     startPoint = null;
     if (currentWall) {
-        // Check if the wall is closed
-        if (currentWall.geometry.vertices[0].equals(currentWall.geometry.vertices[currentWall.geometry.vertices.length - 1])) console.log("Wall is closed");
-        else console.log("Wall is not closed");
         walls.push(currentWall);
         currentWall = null;
     }
@@ -689,6 +701,6 @@ animate();
 // Detect the floor when the scene is loaded
 detectFloor();
 
-},{"three":"ktPTu"}]},["dbx8l","fM4b8"], "fM4b8", "parcelRequire20bc")
+},{"three":"ktPTu"}]},["8jXYs","fM4b8"], "fM4b8", "parcelRequire20bc")
 
 //# sourceMappingURL=try.c3f2f916.js.map

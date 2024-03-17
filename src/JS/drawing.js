@@ -12,7 +12,7 @@ document.body.appendChild(renderer.domElement);
 const walls = [];
 let floor = null;
 
-let cube = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+let cube = new THREE.BoxGeometry(0.1, 0.1, 0.1);
 let material = new THREE.MeshBasicMaterial({ color: 'white' });
 let mesh = new THREE.Mesh(cube, material);
 scene.add(mesh);
@@ -46,22 +46,30 @@ function onMouseMove(event) {
 }
 
 function onMouseUp(event) {
-    console.log("start point == ", startPoint);
-    console.log("end point = ", endPoints);
-    allLines.push([startPoint,endPoints]);
-    window.localStorage.setItem("lines", JSON.stringify(allLines))
-    console.log("all lines = ", allLines);
-    startPoint = null;
-    if (currentWall) {
-        // Check if the wall is closed
-        if (currentWall.geometry.vertices[0].equals(currentWall.geometry.vertices[currentWall.geometry.vertices.length - 1])) {
-            console.log("Wall is closed");
-        } else {
-            console.log("Wall is not closed");
+
+        console.log("start point == ",Math.ceil(startPoint.x),Math.ceil(startPoint.y));
+        console.log("end point = ", Math.ceil(endPoints.x),Math.ceil(endPoints.y));
+        startPoint.x = Math.ceil(startPoint.x);
+        startPoint.y = Math.ceil(startPoint.y);
+        endPoints.x = Math.ceil(endPoints.x);
+        endPoints.y = Math.ceil(endPoints.y);
+        // Check if the start and end points are close enough to close the line
+        if (startPoint && endPoints && startPoint.distanceTo(endPoints) < 0.1) {
+            console.log("Line is closed");
+            // Close the line by connecting the last point to the start point
+            updateWall(currentWall, startPoint, startPoint);
         }
-        walls.push(currentWall);
-        currentWall = null;
-    }
+        
+        allLines.push([startPoint, endPoints]);
+        window.localStorage.setItem("lines", JSON.stringify(allLines))
+        console.log("all lines = ", allLines);
+        startPoint = null;
+        if (currentWall) {
+            walls.push(currentWall);
+            currentWall = null;
+        }
+    
+    
 }
 
 function getMousePosition(event) {

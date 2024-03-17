@@ -142,15 +142,16 @@
       this[globalName] = mainExports;
     }
   }
-})({"hK5jU":[function(require,module,exports) {
+})({"huyXf":[function(require,module,exports) {
 var global = arguments[3];
 var HMR_HOST = null;
 var HMR_PORT = null;
 var HMR_SECURE = false;
 var HMR_ENV_HASH = "d6ea1d42532a7575";
+var HMR_USE_SSE = false;
 module.bundle.HMR_BUNDLE_ID = "15ce42d5c028836f";
 "use strict";
-/* global HMR_HOST, HMR_PORT, HMR_ENV_HASH, HMR_SECURE, chrome, browser, __parcel__import__, __parcel__importScripts__, ServiceWorkerGlobalScope */ /*::
+/* global HMR_HOST, HMR_PORT, HMR_ENV_HASH, HMR_SECURE, HMR_USE_SSE, chrome, browser, __parcel__import__, __parcel__importScripts__, ServiceWorkerGlobalScope */ /*::
 import type {
   HMRAsset,
   HMRMessage,
@@ -189,6 +190,7 @@ declare var HMR_HOST: string;
 declare var HMR_PORT: string;
 declare var HMR_ENV_HASH: string;
 declare var HMR_SECURE: boolean;
+declare var HMR_USE_SSE: boolean;
 declare var chrome: ExtensionContext;
 declare var browser: ExtensionContext;
 declare var __parcel__import__: (string) => Promise<void>;
@@ -232,7 +234,8 @@ if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== "undefined") {
         "0.0.0.0"
     ].includes(hostname) ? "wss" : "ws";
     var ws;
-    try {
+    if (HMR_USE_SSE) ws = new EventSource("/__parcel_hmr");
+    else try {
         ws = new WebSocket(protocol + "://" + hostname + (port ? ":" + port : "") + "/");
     } catch (err) {
         if (err.message) console.error(err.message);
@@ -302,12 +305,14 @@ if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== "undefined") {
             }
         }
     };
-    ws.onerror = function(e) {
-        if (e.message) console.error(e.message);
-    };
-    ws.onclose = function() {
-        console.warn("[parcel] \uD83D\uDEA8 Connection to the HMR server was lost");
-    };
+    if (ws instanceof WebSocket) {
+        ws.onerror = function(e) {
+            if (e.message) console.error(e.message);
+        };
+        ws.onclose = function() {
+            console.warn("[parcel] \uD83D\uDEA8 Connection to the HMR server was lost");
+        };
+    }
 }
 function removeErrorOverlay() {
     var overlay = document.getElementById(OVERLAY_ID);
@@ -1397,7 +1402,7 @@ class OrbitControls extends (0, _three.EventDispatcher) {
     }
 }
 
-},{"three":"ktPTu","@parcel/transformer-js/src/esmodule-helpers.js":"8ppW9"}],"h1oCP":[function(require,module,exports) {
+},{"three":"ktPTu","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"h1oCP":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "image1", ()=>(0, _image1JpegDefault.default));
@@ -1425,10 +1430,10 @@ var _image7JpegDefault = parcelHelpers.interopDefault(_image7Jpeg);
 var _floor1Jpeg = require("./floor1.jpeg");
 var _floor1JpegDefault = parcelHelpers.interopDefault(_floor1Jpeg);
 
-},{"./image1.jpeg":"gvqT3","./image2.jpeg":"5q9dG","./image3.jpeg":"dWmot","./image4.jpeg":"3g773","./image5.jpeg":"hYjH8","./image6.jpeg":"asKiv","./image7.jpeg":"2HSjQ","@parcel/transformer-js/src/esmodule-helpers.js":"8ppW9","./floor1.jpeg":"ePkAn"}],"gvqT3":[function(require,module,exports) {
-module.exports = require("21b85832ae139e9c").getBundleURL("1S4pX") + "image1.206f1365.jpeg" + "?" + Date.now();
+},{"./image1.jpeg":"zmjdu","./image2.jpeg":"6ypC5","./image3.jpeg":"c7tu7","./image4.jpeg":"2T4Jp","./image5.jpeg":"7mNmR","./image6.jpeg":"4jh22","./image7.jpeg":"jxDUQ","./floor1.jpeg":"6QWG1","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"zmjdu":[function(require,module,exports) {
+module.exports = require("c74087f0d307a3ee").getBundleURL("1S4pX") + "image1.206f1365.jpeg" + "?" + Date.now();
 
-},{"21b85832ae139e9c":"b1aeW"}],"b1aeW":[function(require,module,exports) {
+},{"c74087f0d307a3ee":"lgJ39"}],"lgJ39":[function(require,module,exports) {
 "use strict";
 var bundleURL = {};
 function getBundleURLCached(id) {
@@ -1463,28 +1468,28 @@ exports.getBundleURL = getBundleURLCached;
 exports.getBaseURL = getBaseURL;
 exports.getOrigin = getOrigin;
 
-},{}],"5q9dG":[function(require,module,exports) {
-module.exports = require("b71efe6fad7eefc5").getBundleURL("1S4pX") + "image2.f46f058f.jpeg" + "?" + Date.now();
+},{}],"6ypC5":[function(require,module,exports) {
+module.exports = require("b7df62a3fc5eb9b1").getBundleURL("1S4pX") + "image2.f46f058f.jpeg" + "?" + Date.now();
 
-},{"b71efe6fad7eefc5":"b1aeW"}],"dWmot":[function(require,module,exports) {
-module.exports = require("85f3bbf3b50e12b0").getBundleURL("1S4pX") + "image3.008f485a.jpeg" + "?" + Date.now();
+},{"b7df62a3fc5eb9b1":"lgJ39"}],"c7tu7":[function(require,module,exports) {
+module.exports = require("ef85afd725957c13").getBundleURL("1S4pX") + "image3.008f485a.jpeg" + "?" + Date.now();
 
-},{"85f3bbf3b50e12b0":"b1aeW"}],"3g773":[function(require,module,exports) {
-module.exports = require("4c69cd9cc359878c").getBundleURL("1S4pX") + "image4.aac5712b.jpeg" + "?" + Date.now();
+},{"ef85afd725957c13":"lgJ39"}],"2T4Jp":[function(require,module,exports) {
+module.exports = require("4184d95c6fb6ed4f").getBundleURL("1S4pX") + "image4.aac5712b.jpeg" + "?" + Date.now();
 
-},{"4c69cd9cc359878c":"b1aeW"}],"hYjH8":[function(require,module,exports) {
-module.exports = require("a9739c9801a30864").getBundleURL("1S4pX") + "image5.be7a053c.jpeg" + "?" + Date.now();
+},{"4184d95c6fb6ed4f":"lgJ39"}],"7mNmR":[function(require,module,exports) {
+module.exports = require("aab6ded6ffd4688b").getBundleURL("1S4pX") + "image5.be7a053c.jpeg" + "?" + Date.now();
 
-},{"a9739c9801a30864":"b1aeW"}],"asKiv":[function(require,module,exports) {
-module.exports = require("7587d71a413de560").getBundleURL("1S4pX") + "image6.28197e47.jpeg" + "?" + Date.now();
+},{"aab6ded6ffd4688b":"lgJ39"}],"4jh22":[function(require,module,exports) {
+module.exports = require("57a307a9e35044de").getBundleURL("1S4pX") + "image6.28197e47.jpeg" + "?" + Date.now();
 
-},{"7587d71a413de560":"b1aeW"}],"2HSjQ":[function(require,module,exports) {
-module.exports = require("3d1d6d1476a08720").getBundleURL("1S4pX") + "image7.7e7d4f0a.jpeg" + "?" + Date.now();
+},{"57a307a9e35044de":"lgJ39"}],"jxDUQ":[function(require,module,exports) {
+module.exports = require("f98f4e9d3894d2d2").getBundleURL("1S4pX") + "image7.7e7d4f0a.jpeg" + "?" + Date.now();
 
-},{"3d1d6d1476a08720":"b1aeW"}],"ePkAn":[function(require,module,exports) {
-module.exports = require("d80dffb98a9765ba").getBundleURL("1S4pX") + "floor1.9d341083.jpeg" + "?" + Date.now();
+},{"f98f4e9d3894d2d2":"lgJ39"}],"6QWG1":[function(require,module,exports) {
+module.exports = require("50172a347df00a88").getBundleURL("1S4pX") + "floor1.9d341083.jpeg" + "?" + Date.now();
 
-},{"d80dffb98a9765ba":"b1aeW"}],"6xUSB":[function(require,module,exports) {
+},{"50172a347df00a88":"lgJ39"}],"6xUSB":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var Stats = function() {
@@ -1580,6 +1585,6 @@ Stats.Panel = function(name, fg, bg) {
 };
 exports.default = Stats;
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"8ppW9"}]},["hK5jU"], null, "parcelRequire20bc")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["huyXf"], null, "parcelRequire20bc")
 
 //# sourceMappingURL=3dview.c028836f.js.map

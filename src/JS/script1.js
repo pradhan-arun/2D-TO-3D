@@ -4,7 +4,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { gsap } from 'gsap';
 import { floor1, image1, image2, image3, image4, image5, image6, image7, image8 } from '../assets/AllImage';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
-import Stats from 'three/examples/jsm/libs/stats.module'
+import Stats from 'three/examples/jsm/libs/stats.module';
+import earcut from 'earcut';
+import Delaunator from 'delaunator';
+
 // Initialize Three.js
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(120, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -20,7 +23,7 @@ const orbit = new OrbitControls(camera, renderer.domElement);
 orbit.enableDamping = true;
 // orbit.enableRotate = true; // Allow rotation
 // orbit.enableZoom = true; // Allow zooming
-// orbit.enablePan = false; // Disable panning
+orbit.enablePan = false; // Disable panning 
 
 var floatingValue = document.getElementsByClassName('floating-section')[0];
 var sidebarValue = document.getElementsByClassName('sidebar')[0];
@@ -88,107 +91,9 @@ document.querySelectorAll('.shape-option').forEach(option => {
 document.getElementById('add-floor').addEventListener('click', function () {
     console.log("add floor is called");
     createFloor(lines);
-
 });
 
-// Event listeners for position modification
-document.getElementById('move-left').addEventListener('click', function () {
-    objectValue.position.x -= 0.1;
-});
 
-document.getElementById('move-right').addEventListener('click', function () {
-    objectValue.position.x += 0.1;
-});
-
-document.getElementById('move-up').addEventListener('click', function () {
-    objectValue.position.y += 0.1;
-});
-
-document.getElementById('move-down').addEventListener('click', function () {
-    objectValue.position.y -= 0.1;
-});
-document.getElementById('forward').addEventListener('click', function () {
-    objectValue.position.z += 0.1;
-});
-
-document.getElementById('backward').addEventListener('click', function () {
-    objectValue.position.z -= 0.1;
-});
-
-// Event listeners for rotation modification
-document.getElementById('rotate-x-in').addEventListener('click', function () {
-    if (objectValue) {
-        objectValue.rotation.x += 0.1; // Rotate around the X-axis
-    }
-});
-document.getElementById('rotate-x-desc').addEventListener('click', function () {
-    if (objectValue) {
-        objectValue.rotation.x -= 0.1; // Rotate around the Y-axis
-    }
-});
-
-// Event listeners for rotation modification
-document.getElementById('rotate-y-in').addEventListener('click', function () {
-    if (objectValue) {
-        objectValue.rotation.y += 0.01; // Rotate around the X-axis
-    }
-});
-document.getElementById('rotate-y-desc').addEventListener('click', function () {
-    if (objectValue) {
-        objectValue.rotation.y -= 0.1; // Rotate around the Y-axis
-    }
-});
-
-// Event listeners for rotation modification
-document.getElementById('rotate-z-in').addEventListener('click', function () {
-    if (objectValue) {
-        objectValue.rotation.z += 0.1; // Rotate around the X-axis
-    }
-});
-document.getElementById('rotate-z-desc').addEventListener('click', function () {
-    if (objectValue) {
-        objectValue.rotation.z -= 0.1; // Rotate around the Y-axis
-    }
-});
-
-// Event listeners for size modification
-document.getElementById('increase-size').addEventListener('click', function () {
-    if (objectValue) {
-        objectValue.scale.x += 0.1; // Increase size by 10%
-    }
-});
-
-document.getElementById('decrease-size').addEventListener('click', function () {
-    if (objectValue) {
-        objectValue.scale.x -= 0.1;
-    }
-});
-
-// Event listeners for size modification
-document.getElementById('scale-z-in').addEventListener('click', function () {
-    if (objectValue) {
-        objectValue.scale.z += 0.1; // Increase size by 10%
-    }
-});
-
-document.getElementById('scale-z-desc').addEventListener('click', function () {
-    if (objectValue) {
-        objectValue.scale.z -= 0.1;
-    }
-});
-
-// Event listeners for scale modification
-document.getElementById('scale-up').addEventListener('click', function () {
-    if (objectValue) {
-        objectValue.scale.y += 0.1;
-    }
-});
-
-document.getElementById('scale-down').addEventListener('click', function () {
-    if (objectValue) {
-        objectValue.scale.y -= 0.1;
-    }
-});
 
 
 
@@ -197,7 +102,7 @@ var wallHeightAbove = 3; // Adjust the height above each wall for the new wall
 
 const wallMeshes = lines.map((linePoints, index) => {
     const mesh = createWallMesh(linePoints);
-    mesh.rotation.x = -Math.PI / 2;
+    // mesh.rotation.x = -Math.PI / 2;
     mesh.name = "wall";
     scene.add(mesh);
     // scene.add(newWallMesh);
@@ -205,8 +110,9 @@ const wallMeshes = lines.map((linePoints, index) => {
     return [mesh]; // Return both the original and new wall meshes
 }).flat(); // Flatten the array of meshes
 
+
 function createWallMesh(linePoints, heightAbove = 0, depth = 3, color = getRandomColor()) {
-    console.log("line page == ", linePoints);
+    // console.log("line page == ", linePoints);
     const shape = new THREE.Shape(linePoints.map(point => new THREE.Vector3(
         point.x,
         point.y,
@@ -214,19 +120,95 @@ function createWallMesh(linePoints, heightAbove = 0, depth = 3, color = getRando
     )));
 
     const extrudeSettings = {
+        curveSegments:32,
+        steps:1,
         depth: depth, // Adjusted wall thickness to include extra width
         bevelEnabled: false
     };
 
     const geometry = new THREE.ExtrudeGeometry(shape, extrudeSettings);
     const material = new THREE.MeshBasicMaterial({ color: color }); // Assign random color to the wall
-    const wallMesh = new THREE.Mesh(geometry, material);
+    const wallMesh = new THREE.Mesh(geometry, material);wallMesh.rotateX(-Math.PI/2)
     wallMesh.name = "wall";
 
     // Offset the position of the wall if heightAbove is specified
     wallMesh.position.y += heightAbove;
 
     return wallMesh;
+}
+
+lines.map(point => createWallMesh1())
+function createWallMesh1(heightAbove = 0.01, depth = 3, color = getRandomColor()) {
+
+ // Convert points to unique list
+const uniquePoints = Array.from(new Set(lines.flatMap(line => line.map(point => JSON.stringify(point))))).map(point => JSON.parse(point));
+console.log("unique points are = ", uniquePoints);
+// const triangles = delaunayTriangulation(uniquePoints);
+// console.log("pppppppppppppppp ",triangles);
+const kk = earcut(uniquePoints);
+console.log("kk == ", kk);
+
+// Create the plane geometry
+const geometry = new THREE.BufferGeometry();
+
+// Create the vertices
+const vertices = [];
+uniquePoints.forEach(point => {
+    vertices.push(point.x, point.y, point.z);
+});
+
+// const delaunay = new Delaunator(vertices);
+// console.log("delunary == ", delaunay.triangles);
+// const triangles = delaunay.triangles;
+
+// const positions = new Float32Array(vertices);
+// const indices = new Uint32Array(triangles);
+
+// console.log("indices  ====   ", indices[indices.length-1]);
+
+
+// Define the indices for two triangles to cover the entire plane
+const indices = [
+    0, 1, 2, // Triangle 1: Vertices 0, 1, 2
+    0, 2, 3, // Triangle 2: Vertices 0, 2, 3
+    1, 6, 4, // Triangle 3: Vertices 1, 6, 4
+    1, 4, 2, // Triangle 4: Vertices 1, 4, 2
+    4, 5, 7, // Triangle 5: Vertices 4, 5, 7
+    4, 7, 6, // Triangle 6: Vertices 4, 7, 6
+    // 3, 2, 7, // Triangle 7: Vertices 3, 2, 7
+
+    
+];
+// var ind = []
+// for(let i = 0; i <indices.length;i++){
+//     console.log("indices = ", indices[i]);
+//     ind.push(indices[i])
+// }
+
+
+// console.log("oindices = ", indices);
+// Set the position attribute
+geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+// Set the index attribute
+geometry.setIndex(indices);
+
+
+
+// Create the material
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.DoubleSide });
+
+// Create the plane mesh
+const plane = new THREE.Mesh(geometry, material);
+plane.name = "G-floor";
+plane.position.y = heightAbove;
+// plane.position.x += 1;
+
+// Rotate the plane to align with the XY plane
+plane.rotateX(-Math.PI / 2);
+
+// Add the plane to the scene
+scene.add(plane);
 }
 
 // Function to generate random color
@@ -469,6 +451,8 @@ function createFloor(linePoints) {
         newWallMesh.name = "wall";
         scene.add(newWallMesh);
     })
+    createWallMesh1(wallHeightAbove)
+
     wallHeightAbove += 2
 }
 
