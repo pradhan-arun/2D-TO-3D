@@ -596,6 +596,7 @@ var _earcut = require("earcut");
 var _earcutDefault = parcelHelpers.interopDefault(_earcut);
 var _delaunator = require("delaunator");
 var _delaunatorDefault = parcelHelpers.interopDefault(_delaunator);
+var floorColor = "";
 // Initialize Three.js
 const scene = new _three.Scene();
 const camera = new _three.PerspectiveCamera(120, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -611,7 +612,7 @@ const orbit = new (0, _orbitControls.OrbitControls)(camera, renderer.domElement)
 orbit.enableDamping = true;
 // orbit.enableRotate = true; // Allow rotation
 // orbit.enableZoom = true; // Allow zooming
-orbit.enablePan = false; // Disable panning 
+// orbit.enablePan = false; // Disable panning 
 var floatingValue = document.getElementsByClassName("floating-section")[0];
 var sidebarValue = document.getElementsByClassName("sidebar")[0];
 var modificationValue = document.getElementById("modification-container");
@@ -673,8 +674,9 @@ document.getElementById("add-floor").addEventListener("click", function() {
 });
 // ALL FUNCTIONS
 var wallHeightAbove = 3; // Adjust the height above each wall for the new wall
+var c = getRandomColor();
 const wallMeshes = lines.map((linePoints, index)=>{
-    const mesh = createWallMesh(linePoints);
+    const mesh = createWallMesh(linePoints, 0, 3);
     // mesh.rotation.x = -Math.PI / 2;
     mesh.name = "wall";
     scene.add(mesh);
@@ -704,7 +706,7 @@ function createWallMesh(linePoints, heightAbove = 0, depth = 3, color = getRando
     return wallMesh;
 }
 lines.map((point)=>createWallMesh1());
-function createWallMesh1(heightAbove = 0.01, depth = 3, color = getRandomColor()) {
+function createWallMesh1(heightAbove = 0.1, depth = 3, color = getRandomColor()) {
     // Convert points to unique list
     const uniquePoints = Array.from(new Set(lines.flatMap((line)=>line.map((point)=>JSON.stringify(point))))).map((point)=>JSON.parse(point));
     console.log("unique points are = ", uniquePoints);
@@ -795,8 +797,14 @@ function onMouseClick(event) {
         // Check if the clicked object is already selected
         if (clickedObject === selectedMesh) {
             // If already selected, deselect it and reset its properties
+            console.log("same object is called");
             if (selectedMesh.material.map === null) selectedMesh.material.color.setHex(originalColor);
             else selectedMesh.material.color.setHex(0xffffff);
+            if (selectedMesh.name === "G-floor" && floorColor != "") {
+                console.log("floor value == ", floorColor);
+                selectedMesh.material.color.set(floorColor);
+                floorColor = "";
+            }
             // Revert to original color
             selectedMesh = null; // Reset selectedMesh
             originalColor = null;
@@ -807,10 +815,16 @@ function onMouseClick(event) {
         } else {
             // If not selected, select it and change its properties
             if (selectedMesh) {
+                console.log("chnage properties");
                 // If there is a previously selected mesh, reset its properties
                 if (selectedMesh.material.map === null) selectedMesh.material.color.setHex(originalColor);
                 else selectedMesh.material.color.setHex(0xffffff); // Revert previous selected mesh to original color
                 if (selectedMesh.name === "window") selectedMesh.material.color.setHex(originalColor);
+                if (selectedMesh.name === "G-floor" && floorColor != "") {
+                    console.log("floor value == ", floorColor);
+                    selectedMesh.material.color.set(floorColor);
+                    floorColor = "";
+                }
             }
             // Update the selected mesh and its properties
             selectedMesh = clickedObject;
@@ -945,6 +959,12 @@ images.forEach((image)=>{
         imagePath = imagePath == "image1" ? (0, _allImage.image1) : imagePath == "image2" ? (0, _allImage.image2) : imagePath == "image3" ? (0, _allImage.image3) : imagePath == "image4" ? (0, _allImage.image4) : imagePath == "image5" ? (0, _allImage.image5) : (0, _allImage.image6);
         if (selectedMesh) {
             console.log("selected mesh === ", selectedMesh);
+            if (selectedMesh.name === "G-floor") {
+                floorColor = "blue";
+                originalColor = "blue";
+                selectedMesh.material.color.set(floorColor);
+                return;
+            }
             // Ensure the geometry's UVs are set
             selectedMesh.uvsNeedUpdate = true;
             const img = new _three.TextureLoader().load(imagePath);

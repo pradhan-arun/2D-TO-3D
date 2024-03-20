@@ -7,6 +7,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import Stats from 'three/examples/jsm/libs/stats.module';
 import earcut from 'earcut';
 import Delaunator from 'delaunator';
+var floorColor = '';
 
 // Initialize Three.js
 const scene = new THREE.Scene();
@@ -23,7 +24,7 @@ const orbit = new OrbitControls(camera, renderer.domElement);
 orbit.enableDamping = true;
 // orbit.enableRotate = true; // Allow rotation
 // orbit.enableZoom = true; // Allow zooming
-orbit.enablePan = false; // Disable panning 
+// orbit.enablePan = false; // Disable panning 
 
 var floatingValue = document.getElementsByClassName('floating-section')[0];
 var sidebarValue = document.getElementsByClassName('sidebar')[0];
@@ -99,9 +100,9 @@ document.getElementById('add-floor').addEventListener('click', function () {
 
 // ALL FUNCTIONS
 var wallHeightAbove = 3; // Adjust the height above each wall for the new wall
-
+var c = getRandomColor();
 const wallMeshes = lines.map((linePoints, index) => {
-    const mesh = createWallMesh(linePoints);
+    const mesh = createWallMesh(linePoints,0,3);
     // mesh.rotation.x = -Math.PI / 2;
     mesh.name = "wall";
     scene.add(mesh);
@@ -138,7 +139,7 @@ function createWallMesh(linePoints, heightAbove = 0, depth = 3, color = getRando
 }
 
 lines.map(point => createWallMesh1())
-function createWallMesh1(heightAbove = 0.01, depth = 3, color = getRandomColor()) {
+function createWallMesh1(heightAbove = 0.1, depth = 3, color = getRandomColor()) {
 
  // Convert points to unique list
 const uniquePoints = Array.from(new Set(lines.flatMap(line => line.map(point => JSON.stringify(point))))).map(point => JSON.parse(point));
@@ -241,9 +242,14 @@ function onMouseClick(event) {
         // Check if the clicked object is already selected
         if (clickedObject === selectedMesh) {
             // If already selected, deselect it and reset its properties
-
+            console.log("same object is called");
             if (selectedMesh.material.map === null) selectedMesh.material.color.setHex(originalColor);
             else selectedMesh.material.color.setHex(0xffffff);
+            if(selectedMesh.name === 'G-floor' && floorColor != ''){
+                console.log("floor value == ", floorColor);
+                selectedMesh.material.color.set(floorColor);
+                floorColor=''
+            }
             // Revert to original color
             selectedMesh = null; // Reset selectedMesh
             originalColor = null;
@@ -254,12 +260,18 @@ function onMouseClick(event) {
         } else {
             // If not selected, select it and change its properties
             if (selectedMesh) {
+                console.log("chnage properties");
                 // If there is a previously selected mesh, reset its properties
                 if (selectedMesh.material.map === null) selectedMesh.material.color.setHex(originalColor);
                 else selectedMesh.material.color.setHex(0xffffff);// Revert previous selected mesh to original color
 
                 if (selectedMesh.name === 'window') {
                     selectedMesh.material.color.setHex(originalColor)
+                }
+                if(selectedMesh.name === 'G-floor' && floorColor != ''){
+                    console.log("floor value == ", floorColor);
+                    selectedMesh.material.color.set(floorColor);
+                    floorColor=''
                 }
             }
             // Update the selected mesh and its properties
@@ -401,6 +413,7 @@ function showModifySection(selectedObject) {
     });
 }
 
+
 //image add section
 const images = document.querySelectorAll('.sidebar img');
 images.forEach(image => {
@@ -415,6 +428,13 @@ images.forEach(image => {
                         : imagePath == 'image5' ? image5 : image6;
         if (selectedMesh) {
             console.log("selected mesh === ", selectedMesh);
+
+            if(selectedMesh.name === 'G-floor'){
+                floorColor = 'blue';
+                originalColor='blue'
+                selectedMesh.material.color.set(floorColor);
+                return
+            }
 
 
             // Ensure the geometry's UVs are set
